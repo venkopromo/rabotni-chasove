@@ -1418,7 +1418,7 @@ body:has(#login:not([hidden])){background:linear-gradient(160deg,#fde68a 0%,#fbc
     var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">' +
       '<head><meta charset="UTF-8"><style>th{background:#151f1a;color:#fff;font-weight:bold}td,th{border:1px solid #c8cec5;padding:3px 6px}</style></head><body>' + body + '</body></html>';
     var a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel' }));
+    a.href = URL.createObjectURL(new Blob(['﻿' + html], { type: 'application/vnd.ms-excel' }));
     a.download = ACCOUNTS[who.id] + '_' + (month ? y + '-' + pad(m + 1) : String(y)) + '.xls';
     document.body.appendChild(a);
     a.click();
