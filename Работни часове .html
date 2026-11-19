@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Работни часове</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  color-scheme:light;
+  --paper:#e5e8e2;
+  --sheet:#fbfbf7;
+  --ink:#151f1a;
+  --ink-2:#3b4841;
+  --muted:#67726b;
+  --rule:#c8cec5;
+  --ok:#11803d;
+  --no:#c4372a;
+  --safety:#f2b705;
+  --hatch:repeating-linear-gradient(-45deg,rgba(242,183,5,.30) 0 6px,transparent 6px 12px);
+  --sans:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --cond:"Barlow Condensed","Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --paper:#0b100e;
+    --sheet:#141b17;
+    --ink:#e8eee9;
+    --ink-2:#b7c2ba;
+    --muted:#8c998f;
+    --rule:#2a3530;
+    --ok:#43c674;
+    --no:#f07461;
+  }
+}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);font:15px/1.4 var(--sans);-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto 0;height:env(safe-area-inset-top,0px);background:var(--sheet);z-index:10}
+[hidden]{display:none!important}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--safety);outline-offset:2px}
+
+.wrap{max-width:600px;margin:0 auto;padding:0 14px 48px}
+
+/* login */
+.login{max-width:420px;margin:9vh auto 0}
+.login h1{font:700 46px/1 var(--cond);margin:0 0 10px;letter-spacing:-.005em}
+.login > p{margin:0 0 26px;color:var(--muted)}
+.acc{display:grid;gap:12px}
+.acc button{display:flex;align-items:stretch;width:100%;height:78px;padding:0 16px 0 0;background:var(--sheet);border:1px solid var(--rule);border-radius:4px;overflow:hidden;cursor:pointer;text-align:left}
+.acc button:hover{border-color:var(--ink)}
+.badge{flex:0 0 78px;display:grid;place-items:center;background:var(--safety);color:#1a1400;font:700 40px/1 var(--cond)}
+.nm{display:flex;flex-direction:column;justify-content:center;margin-left:16px}
+.nm b{font:600 26px/1.05 var(--cond)}
+.nm small{color:var(--muted);font-size:13px}
+#loginMsg{min-height:1.4em;margin-top:16px;font-size:14px}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--sheet);border-bottom:2px solid var(--ink);margin:0 -14px;padding:12px 14px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.who{font:700 28px/1 var(--cond)}
+.meta{display:flex;gap:12px;align-items:baseline;margin-top:6px;font-size:13px}
+.linkbtn{background:none;border:0;padding:0;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer;font-size:13px}
+.sync{color:var(--muted);font-size:12px}
+.rate{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:12px;color:var(--muted)}
+.prefs{display:flex;gap:16px;align-items:flex-end}
+.rate select{width:100px;height:36px;text-align:right;font:600 22px/1 var(--cond);font-variant-numeric:tabular-nums;border:0;border-bottom:2px solid var(--ink);background:transparent;border-radius:0;padding:0 2px}
+.rate select:focus{outline:none;border-bottom-color:var(--safety)}
+
+/* month */
+.monthbar{display:flex;align-items:center;gap:12px;margin:22px 0 14px}
+.monthbar h2{margin:0;flex:1;font:700 42px/1 var(--cond);letter-spacing:-.005em}
+.monthbar button{width:46px;height:46px;padding:0;display:grid;place-items:center;background:transparent;border:2px solid var(--ink);border-radius:4px;font:600 28px/1 var(--cond);cursor:pointer}
+.monthbar button:hover:not(:disabled){background:var(--ink);color:var(--sheet)}
+.monthbar button:disabled{opacity:.3;cursor:default}
+
+.stamp{display:grid;grid-template-columns:1fr 1fr;background:var(--sheet);border:1px solid var(--rule);border-left:10px solid var(--safety);border-radius:4px;margin-bottom:16px}
+.stamp > div{padding:12px 14px}
+.stamp > div + div{border-left:1px solid var(--rule)}
+.stamp span{display:block;color:var(--muted);font-size:13px}
+.stamp b{display:block;font:700 34px/1.05 var(--cond);font-variant-numeric:tabular-nums}
+
+.legend{display:grid;gap:4px;font-size:13px;color:var(--ink-2);margin:0 2px 18px}
+.legend b{display:inline-block;min-width:74px;font-weight:600;color:var(--ink)}
+
+/* weeks */
+.week{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;margin-bottom:14px;overflow:hidden}
+.wk-head{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--ink);color:var(--sheet);font:600 17px/1.2 var(--cond)}
+.wk-ctl{display:flex;flex-wrap:wrap;gap:10px 18px;padding:10px 12px;border-top:1px solid var(--rule);background:var(--paper)}
+.wk-field{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+.wk-field select{width:118px;height:34px;min-width:0;padding:0 4px;background:var(--sheet);border:1px solid var(--rule);border-radius:3px;font-size:14px}
+.day{display:grid;grid-template-columns:38px 52px minmax(0,1.2fr) minmax(0,.8fr) 64px;gap:8px;align-items:center;padding:8px 12px;border-top:1px solid var(--rule)}
+.day.we{background:rgba(21,31,26,.035)}
+.dname{font:600 17px/1 var(--cond);white-space:nowrap}
+.dname span{font-weight:500;color:var(--muted);margin-left:2px}
+.mark{width:38px;height:38px;padding:0;display:grid;place-items:center;background:transparent;border:2px solid var(--rule);border-radius:4px;cursor:pointer;font:700 22px/1 var(--cond)}
+.mark.yes{background:var(--ok);border-color:var(--ok);color:var(--sheet)}
+.mark.no{border-color:var(--no);color:var(--no)}
+.day select,.day input{width:100%;height:36px;min-width:0;padding:0 2px;background:transparent;border:0;border-bottom:1px solid var(--rule);border-radius:0;font-size:15px}
+.day select:focus,.day input:focus{outline:none;border-bottom:2px solid var(--ink)}
+.day input{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+
+.adv{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-top:1px solid var(--rule);font-size:14px}
+.adv.on{background:var(--hatch)}
+.adv label{display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:500}
+.adv.on label{font-weight:700}
+.adv input[type=checkbox]{width:20px;height:20px;margin:0;accent-color:var(--ink)}
+.adv input[type=number]{width:130px;height:36px;padding:0 2px;background:transparent;border:0;border-bottom:1px solid var(--ink);border-radius:0;text-align:right;font:600 18px/1 var(--cond);font-variant-numeric:tabular-nums}
+.adv input[type=number]:focus{outline:none;border-bottom:2px solid var(--ink)}
+
+.wk-total{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:10px 12px;border-top:2px solid var(--ink);background:var(--paper)}
+.wk-total .lbl{font:600 16px/1 var(--cond);color:var(--ink-2)}
+.wk-total .v{font:700 22px/1 var(--cond);font-variant-numeric:tabular-nums;text-align:right}
+
+/* month summary */
+.summary{display:grid;gap:14px;margin-top:28px}
+.card{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;padding:0 14px 6px}
+.card h3{margin:0;padding:12px 0 10px;font:700 24px/1 var(--cond);border-bottom:2px solid var(--ink)}
+.stat{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule);font-size:14px;color:var(--ink-2)}
+.stat b{font:600 21px/1 var(--cond);color:var(--ink);font-variant-numeric:tabular-nums}
+.stat.big{margin:8px -14px 6px;padding:12px 14px;border:0;background:var(--safety);color:#1a1400;font-size:15px;font-weight:600}
+.stat.big b{font:700 32px/1 var(--cond);color:#1a1400}
+.chip{display:inline-block;margin:4px 6px 10px 0;padding:4px 9px;border:1.5px solid var(--no);border-radius:3px;color:var(--no);font:600 16px/1 var(--cond)}
+.muted{color:var(--muted);font-size:14px}
+.card .muted{display:block;padding:6px 0 12px}
+.rent{margin-top:4px}
+.rent + .rent{margin-top:14px}
+.rent-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--rule);font-size:14px;color:var(--ink-2);cursor:pointer}
+.rent input[type=checkbox]{width:20px;height:20px;margin:0;accent-color:var(--ink)}
+.rent input[type=number]{width:150px;height:36px;padding:0 2px;background:transparent;border:0;border-bottom:1px solid var(--ink);border-radius:0;text-align:right;font:600 20px/1 var(--cond);font-variant-numeric:tabular-nums}
+.rent input[type=number]:focus{outline:none;border-bottom:2px solid var(--ink)}
+</style>
+</head>
+<body>
+
+<section id="login" class="login">
+  <h1>Работни часове</h1>
+  <p>Изберете акаунт.</p>
+  <div class="acc">
+    <button type="button" data-user="venelin"><span class="badge">V</span><span class="nm"><b>Venelin</b><small>Венелин</small></span></button>
+    <button type="button" data-user="emilia"><span class="badge">E</span><span class="nm"><b>Emilia</b><small>Емилия</small></span></button>
+  </div>
+  <div id="loginMsg" class="muted"></div>
+</section>
+
+<div id="app" class="wrap" hidden>
+  <header class="top">
+    <div>
+      <div class="who" id="who"></div>
+      <div class="meta">
+        <button type="button" class="linkbtn" id="switch">Смени акаунт</button>
+        <span class="sync" id="sync"></span>
+      </div>
+    </div>
+    <div class="prefs">
+      <label class="rate">Часове на ден
+        <select id="dayhours" aria-label="Часове на ден"></select>
+      </label>
+      <label class="rate">Kč на час
+      <select id="rate" aria-label="Заплащане на час"></select>
+    </label>
+    </div>
+  </header>
+
+  <div class="monthbar">
+    <button type="button" id="prev" aria-label="Предишен месец">‹</button>
+    <h2 id="mtitle"></h2>
+    <button type="button" id="next" aria-label="Следващ месец">›</button>
+  </div>
+
+  <div class="stamp" id="mtot"></div>
+
+  <div class="legend">
+    <div><b>Смени</b> 1 първа · 2 втора · 3 нощна</div>
+    <div><b>Участък</b> M Montáže · L Lakovna · V Vstrikovna</div>
+  </div>
+
+  <div id="weeks"></div>
+  <div class="card rent">
+    <h3>Наем квартира</h3>
+    <label class="rent-row"><span>Платен е за този месец</span><input type="checkbox" id="rentPaid"></label>
+    <label class="rent-row"><span>Сума (ръчно)</span><input type="number" id="rentAmt" min="0" step="1" inputmode="numeric" placeholder="Kč"></label>
+  </div>
+  <div class="card rent">
+    <h3>Екстра за колата</h3>
+    <label class="rent-row"><span>Сума за месеца (ръчно)</span><input type="number" id="carAmt" min="0" step="1" inputmode="numeric" placeholder="Kč"></label>
+  </div>
+  <div class="summary" id="summary"></div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var claude = window.claude;
+  function capability(name) {
+    return claude && claude.use ? claude.use(name) : Promise.resolve(null);
+  }
+  var dbP = capability('db');
+  var userP = capability('user');
+
+  var ACCOUNTS = { venelin: 'Venelin', emilia: 'Emilia' };
+  var MONTHS = ['Януари','Февруари','Март','Април','Май','Юни','Юли','Август','Септември','Октомври','Ноември','Декември'];
+  var MON = ['ян','фев','мар','апр','май','юни','юли','авг','сеп','окт','ное','дек'];
+  var DAYS = ['Пон','Вт','Ср','Чт','Пет','Съб','Нед'];
+  var SHIFTS = [['', '–'], ['1', '1 първа'], ['2', '2 втора'], ['3', '3 нощна']];
+  var SECTIONS = [['', '–'], ['M', 'M'], ['L', 'L'], ['V', 'V']];
+  var MIN_VIEW = new Date(2026, 9, 1);  // октомври 2026
+  var MAX_VIEW = new Date(2027, 11, 1); // декември 2027
+  function clampView() {
+    if (view < MIN_VIEW) view = new Date(MIN_VIEW);
+    if (view > MAX_VIEW) view = new Date(MAX_VIEW);
+  }
+
+  var who = null, data = null, dbDoc = null, view = null;
+  var saveTimer = 0, chain = Promise.resolve();
+
+  var $ = function (id) { return document.getElementById(id); };
+  var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+  var ymd = function (d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+  var addDays = function (d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); };
+  var wd = function (d) { return (d.getDay() + 6) % 7; }; // 0 = понеделник
+  var num = function (v) { var n = parseFloat(v); return isFinite(n) ? n : 0; };
+  var fmtH = function (v) { return (Math.round(v * 100) / 100).toLocaleString('bg-BG') + ' ч'; };
+  var fmtM = function (v) { return Math.round(v).toLocaleString('bg-BG') + ' Kč'; };
+  var rangeLabel = function (s) {
+    var e = addDays(s, 6);
+    return s.getDate() + ' ' + MON[s.getMonth()] + ' – ' + e.getDate() + ' ' + MON[e.getMonth()];
+  };
+  var el = function (tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  };
+  var rec = function (key) { return data.days[key] || (data.days[key] = {}); };
+  var peek = function (key) { return data.days[key] || {}; };
+  var setSync = function (t) { $('sync').textContent = t; };
+
+  // Заплащане на час: от 150 до 190 Kč
+  (function fillRates() {
+    var s = $('rate');
+    s.add(new Option('–', ''));
+    for (var k = 150; k <= 190; k += 5) s.add(new Option(k + ' Kč', String(k)));
+  })();
+
+  // Часове на ден: от 7 до 12, на 0,5
+  (function fillHours() {
+    var s = $('dayhours');
+    s.add(new Option('–', ''));
+    for (var h = 7; h <= 12; h += 0.5) s.add(new Option(String(h).replace('.', ',') + ' ч', String(h)));
+  })();
+
+  /* ---------- storage: shared db when available, localStorage always ---------- */
+
+  function readLocal(id) {
+    try { return JSON.parse(localStorage.getItem('worktime_' + id)); } catch (e) { return null; }
+  }
+
+  function pickNewer(a, b) {
+    var okA = a && typeof a === 'object' && a.days;
+    var okB = b && typeof b === 'object' && b.days;
+    if (okA && okB) return num(a.updated) >= num(b.updated) ? a : b;
+    if (okA) return a;
+    if (okB) return b;
+    return { rate: '', days: {}, updated: 0 };
+  }
+
+  function save() {
+    data.updated = Date.now();
+    try { localStorage.setItem('worktime_' + who.id, JSON.stringify(data)); } catch (e) {}
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(pushRemote, 700);
+  }
+
+  function pushRemote() {
+    saveTimer = 0;
+    if (!dbDoc) return;
+    var ref = dbDoc;
+    var body = JSON.parse(JSON.stringify(data));
+    chain = chain
+      .then(function () { return ref.set(body); })
+      .then(function () { setSync('Синхронизирано'); })
+      .catch(function () { setSync('Само на това устройство'); });
+  }
+
+  function fillDefaultHours(key) {
+    var x = rec(key);
+    if (x.w === 'yes') {
+      var p = key.split('-');
+      var d = new Date(+p[0], +p[1] - 1, +p[2]);
+      var wkDef = (data.weeks && data.weeks[ymd(addDays(d, -wd(d)))]) || {};
+      if (!x.s && wkDef.s) x.s = wkDef.s;
+      if (!x.sec && wkDef.sec) x.sec = wkDef.sec;
+      if (!x.h && data.dayHours) x.h = data.dayHours;
+    }
+    return false;
+  }
+
+  function flush() {
+    if (saveTimer) { clearTimeout(saveTimer); pushRemote(); }
+  }
+
+  async function openAccount(id) {
+    $('loginMsg').textContent = 'Зареждане…';
+    var db = null, user = null, uid = null;
+    try {
+      var caps = await Promise.all([dbP, userP]);
+      db = caps[0];
+      user = caps[1];
+      uid = user ? await user.id() : null;
+    } catch (e) {}
+
+    dbDoc = (db && uid) ? db.collection('data/users/' + uid).doc(id) : null;
+    var remote = null;
+    if (dbDoc) {
+      try {
+        var snap = await dbDoc.get();
+        remote = snap.exists ? snap.data() : null;
+      } catch (e) { dbDoc = null; }
+    }
+
+    who = { id: id };
+    data = pickNewer(remote, readLocal(id));
+    $('loginMsg').textContent = '';
+    $('who').textContent = ACCOUNTS[id];
+    $('rate').value = String(data.rate == null ? '' : data.rate);
+    $('dayhours').value = String(data.dayHours == null ? '' : data.dayHours);
+    data.dayHours = $('dayhours').value;
+    data.rate = $('rate').value;
+    $('login').hidden = true;
+    $('app').hidden = false;
+    setSync(dbDoc ? 'Синхронизирано' : 'На това устройство');
+
+    var now = new Date();
+    view = new Date(now.getFullYear(), now.getMonth(), 1);
+    clampView();
+    render();
+  }
+
+  function showLogin() {
+    flush();
+    who = null; data = null; dbDoc = null;
+    $('app').hidden = true;
+    $('login').hidden = false;
+    $('loginMsg').textContent = '';
+  }
+
+  /* ---------- calendar ---------- */
+
+  // Weeks Monday–Sunday that touch the viewed month; only in-month days are kept.
+  function monthWeeks() {
+    var y = view.getFullYear(), m = view.getMonth();
+    var first = new Date(y, m, 1), last = new Date(y, m + 1, 0);
+    var out = [];
+    for (var s = addDays(first, -wd(first)); s <= last; s = addDays(s, 7)) {
+      var days = [];
+      for (var i = 0; i < 7; i++) {
+        var d = addDays(s, i);
+        if (d.getMonth() === m) days.push(d);
+      }
+      out.push({ start: s, days: days });
+    }
+    return out;
+  }
+
+  function sel(opts, val) {
+    var s = el('select');
+    opts.forEach(function (o) { s.add(new Option(o[1], o[0])); });
+    s.value = val || '';
+    return s;
+  }
+
+  function paintMark(b, v) {
+    b.className = 'mark' + (v === 'yes' ? ' yes' : v === 'no' ? ' no' : '');
+    b.textContent = v === 'yes' ? '✓' : v === 'no' ? '✗' : '';
+    b.setAttribute('aria-label', v === 'yes' ? 'Работен ден' : v === 'no' ? 'Не работя' : 'Не е отбелязано');
+  }
+
+  function dayRow(d) {
+    var key = ymd(d), r = peek(key);
+    var row = el('div', 'day' + (d.getDay() % 6 === 0 ? ' we' : ''));
+
+    var mark = el('button', 'mark');
+    mark.type = 'button';
+    paintMark(mark, r.w);
+    mark.addEventListener('click', function () {
+      var x = rec(key);
+      x.w = x.w === 'yes' ? 'no' : x.w === 'no' ? '' : 'yes';
+      fillDefaultHours(key);
+      hi.value = x.h == null ? '' : x.h;
+      sh.value = x.s || '';
+      sc.value = x.sec || '';
+      paintMark(mark, x.w);
+      save();
+      refresh();
+    });
+
+    var name = el('div', 'dname');
+    name.append(el('b', '', DAYS[wd(d)]), ' ', el('span', '', String(d.getDate())));
+
+    var sh = sel(SHIFTS, r.s);
+    sh.setAttribute('aria-label', 'Смяна');
+    sh.addEventListener('change', function () { rec(key).s = sh.value; save(); });
+
+    var sc = sel(SECTIONS, r.sec);
+    sc.setAttribute('aria-label', 'Участък');
+    sc.addEventListener('change', function () { rec(key).sec = sc.value; save(); });
+
+    var hi = el('input');
+    hi.type = 'number'; hi.min = '0'; hi.max = '24'; hi.step = '0.5'; hi.inputMode = 'decimal';
+    hi.placeholder = 'ч';
+    hi.setAttribute('aria-label', 'Часове');
+    hi.value = r.h == null ? '' : r.h;
+    hi.addEventListener('input', function () { rec(key).h = hi.value; save(); refresh(); });
+
+    row.append(mark, name, sh, sc, hi);
+    return row;
+  }
+
+  function advRow(d) {
+    var key = ymd(d), r = peek(key);
+    var row = el('div', 'adv' + (r.adv ? ' on' : ''));
+
+    var lab = el('label');
+    var cb = el('input');
+    cb.type = 'checkbox';
+    cb.checked = !!r.adv;
+    cb.addEventListener('change', function () {
+      rec(key).adv = cb.checked;
+      row.classList.toggle('on', cb.checked);
+      save();
+      refresh();
+    });
+    lab.append(cb, ' Взех аванс');
+
+    var amt = el('input');
+    amt.type = 'number'; amt.min = '0'; amt.step = '1'; amt.inputMode = 'numeric';
+    amt.placeholder = 'сума Kč';
+    amt.setAttribute('aria-label', 'Сума на аванса');
+    amt.value = r.advAmt == null ? '' : r.advAmt;
+    amt.addEventListener('input', function () { rec(key).advAmt = amt.value; save(); refresh(); });
+
+    row.append(lab, amt);
+    return row;
+  }
+
+function weekControls(w) {
+    var def = (data.weeks && data.weeks[ymd(w.start)]) || {};
+    var ss = sel(SHIFTS, def.s);
+    var sc = sel(SECTIONS, def.sec);
+    ss.setAttribute('aria-label', 'Смяна за седмицата');
+    sc.setAttribute('aria-label', 'Участък за седмицата');
+    ss.addEventListener('change', function () { setWeekDefault(w, 's', ss.value); });
+    sc.addEventListener('change', function () { setWeekDefault(w, 'sec', sc.value); });
+    var box = el('div', 'wk-ctl');
+    var f1 = el('label', 'wk-field');
+    var f2 = el('label', 'wk-field');
+    f1.append(el('span', '', 'Смяна'), ss);
+    f2.append(el('span', '', 'Участък'), sc);
+    box.append(f1, f2);
+    return box;
+  }
+
+  function setWeekDefault(w, field, val) {
+    data.weeks = data.weeks || {};
+    var wk = ymd(w.start);
+    var def = data.weeks[wk] || (data.weeks[wk] = {});
+    def[field] = val;
+    if (val) {
+      for (var i = 0; i < 7; i++) {
+        var x = rec(ymd(addDays(w.start, i)));
+        if (x.w !== 'no') x[field] = val;
+      }
+    }
+    save();
+    render();
+  }
+
+function rentKey() {
+    return view.getFullYear() + '-' + pad(view.getMonth() + 1);
+  }
+
+  function monthRent() {
+    data.rent = data.rent || {};
+    return data.rent[rentKey()] || (data.rent[rentKey()] = {});
+  }
+
+  function render() {
+    $('mtitle').textContent = MONTHS[view.getMonth()] + ' ' + view.getFullYear();
+    $('prev').disabled = view <= MIN_VIEW;
+    $('next').disabled = view >= MAX_VIEW;
+    var rv = (data.rent && data.rent[rentKey()]) || {};
+    $('rentPaid').checked = !!rv.paid;
+    $('rentAmt').value = rv.amt == null ? '' : rv.amt;
+    $('carAmt').value = rv.car == null ? '' : rv.car;
+    var wrap = $('weeks');
+    wrap.innerHTML = '';
+    monthWeeks().forEach(function (w, i) {
+      var card = el('section', 'week');
+      card.appendChild(el('div', 'wk-head', 'Седмица ' + (i + 1) + ' · ' + rangeLabel(w.start)));
+      card.appendChild(weekControls(w));
+      w.days.forEach(function (d) {
+        card.appendChild(dayRow(d));
+        if (d.getDay() === 5) card.appendChild(advRow(d));
+      });
+      var tot = el('div', 'wk-total');
+      tot.append(el('span', 'lbl', 'Общо седмица'), el('span', 'v', ''));
+      card.appendChild(tot);
+      wrap.appendChild(card);
+    });
+    refresh();
+  }
+
+  function refresh() {
+    var rate = num(data.rate);
+    var weeks = monthWeeks();
+    var cards = $('weeks').children;
+    var mh = 0, madv = 0, workDays = 0, off = [];
+
+    weeks.forEach(function (w, i) {
+      var h = 0, a = 0;
+      w.days.forEach(function (d) {
+        var r = peek(ymd(d));
+        h += r.w === 'no' ? 0 : num(r.h);
+        a += num(r.advAmt);
+        if (r.w === 'yes') workDays++;
+        else if (r.w === 'no' && wd(d) < 5) off.push(d); // понеделник–петък, отбелязани с ✗
+      });
+      mh += h;
+      madv += a;
+      var v = cards[i] && cards[i].querySelector('.wk-total .v');
+      if (v) v.textContent = fmtH(h) + ' · ' + fmtM(h * rate) + (a ? ' · аванс ' + fmtM(a) : '');
+    });
+
+    var earn = mh * rate;
+    var rv = (data.rent && data.rent[rentKey()]) || {};
+    var rentSum = num(rv.amt);
+    var carSum = num(rv.car);
+    $('mtot').innerHTML =
+      '<div><span>Часове</span><b>' + fmtH(mh) + '</b></div>' +
+      '<div><span>Заработка</span><b>' + fmtM(earn) + '</b></div>';
+
+    var stat = function (label, value, big) {
+      return '<div class="stat' + (big ? ' big' : '') + '"><span>' + label + '</span><b>' + value + '</b></div>';
+    };
+    $('summary').innerHTML =
+      '<div class="card"><h3>Общо за ' + MONTHS[view.getMonth()].toLowerCase() + '</h3>' +
+        stat('Часове', fmtH(mh)) +
+        stat('Работни дни', String(workDays)) +
+        stat('Заработка', fmtM(earn)) +
+        stat('Аванси', '− ' + fmtM(madv)) +
+        stat('Наем квартира', rentSum ? '− ' + fmtM(rentSum) : '–') +
+        stat('Екстра за колата', carSum ? '+ ' + fmtM(carSum) : '–') +
+        stat('Остава за получаване', fmtM(earn + carSum - madv - rentSum), true) +
+      '</div>' +
+      '<div class="card"><h3>Неработни дни с ✗ (пон–пет): ' + off.length + '</h3>' +
+        (off.length
+          ? off.map(function (d) { return '<span class="chip">' + DAYS[wd(d)] + ' ' + d.getDate() + '</span>'; }).join('')
+          : '<span class="muted">Няма</span>') +
+      '</div>';
+  }
+
+  /* ---------- events ---------- */
+
+  document.querySelectorAll('.acc button').forEach(function (b) {
+    b.addEventListener('click', function () { openAccount(b.getAttribute('data-user')); });
+  });
+  $('switch').addEventListener('click', showLogin);
+  $('prev').addEventListener('click', function () {
+    view = new Date(view.getFullYear(), view.getMonth() - 1, 1);
+    render();
+    window.scrollTo(0, 0);
+  });
+  $('next').addEventListener('click', function () {
+    view = new Date(view.getFullYear(), view.getMonth() + 1, 1);
+    render();
+    window.scrollTo(0, 0);
+  });
+  $('rentPaid').addEventListener('change', function () {
+    monthRent().paid = $('rentPaid').checked;
+    save();
+  });
+  $('rentAmt').addEventListener('input', function () {
+    monthRent().amt = $('rentAmt').value;
+    save();
+    refresh();
+  });
+  $('carAmt').addEventListener('input', function () {
+    monthRent().car = $('carAmt').value;
+    save();
+    refresh();
+  });
+  $('dayhours').addEventListener('change', function () {
+    data.dayHours = $('dayhours').value;
+    monthWeeks().forEach(function (w) { w.days.forEach(function (d) { fillDefaultHours(ymd(d)); }); });
+    save();
+    render();
+  });
+  $('rate').addEventListener('change', function () {
+    data.rate = $('rate').value;
+    save();
+    refresh();
+  });
+  window.addEventListener('pagehide', flush);
+})();
+</script>
+</body>
+</html>
